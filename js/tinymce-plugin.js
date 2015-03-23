@@ -13,7 +13,7 @@ jQuery(document).ready(function ($) {
 					if (msgLength > 160) {
 						alert('Le message est trop long de ' + (msgLength - 160) + ' caractères');
 					} else {
-						content = '<a href="[twitter_linkhash text=\'' + tinyMCE.activeEditor.selection.getContent({format : 'text'}) + '\']" target="_blank" rel="nofollow" style="color:#4099ff">[twitter_icon] ' + selected + '</a>';
+						content = '<a href="[twitter_linkhash text=\'' + tinyMCE.activeEditor.selection.getContent({format : 'text'}).replace(/'/g, " ") + '\']" target="_blank" rel="nofollow" style="color:#4099ff">[twitter_icon] ' + selected + '</a>';
                         tinymce.execCommand('mceInsertContent', false, content);
 					}
                 } else {
