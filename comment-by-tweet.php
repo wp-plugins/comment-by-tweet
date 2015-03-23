@@ -3,7 +3,7 @@
 Plugin Name: Comment by Tweet
 Plugin URI: http://amauri.champeaux.fr/comment-by-tweet/
 Description: Système de commentaires basé sur les hashtags Twitter
-Version: 0.1
+Version: 0.2
 Author: Amauri CHAMPEAUX
 Author URI: http://amauri.champeaux.fr/a-propos/
 */
@@ -18,7 +18,7 @@ function commentByTweet_add_meta_box() {
     foreach ( $screens as $screen ) {
         add_meta_box(
             'commentByTweet_hashtag',
-            __( 'Hashtag pour le suivi des tweets', 'commentByTweet_textdomain' ),
+            __( 'Hashtag pour le suivi des tweets', 'commentByTweet' ),
             'commentByTweet_meta_box_callback',
             $screen
         );
@@ -40,19 +40,45 @@ function commentByTweet_meta_box_callback( $post ) {
      * Use get_post_meta() to retrieve an existing value
      * from the database and use the value for the form.
      */
-    $hash = get_post_meta( $post->ID, 'commentByTweetHash', true );
-    $link = get_post_meta( $post->ID, 'commentByTweetLink', true );
-    if($link == 'on') {$isChecked = 'checked';}
+    $hash           = get_post_meta( $post->ID, 'commentByTweetHash', true );
+    $lang           = get_post_meta( $post->ID, 'commentByTweetLang', true );
+    $from           = get_post_meta( $post->ID, 'commentByTweetFrom', true );
+    $fromTo         = get_post_meta( $post->ID, 'commentByTweetFromTo', true );
+    $fromFrom       = get_post_meta( $post->ID, 'commentByTweetFromFrom', true );
+    $fromMention    = get_post_meta( $post->ID, 'commentByTweetFromMention', true );
 
     echo '<label for="commentByTweet_hash">';
-    _e( 'Hashtag (sans #) qui servira pour le suivi des "tweetmentaires"', 'commentByTweet_textdomain' );
+    _e( '<b>Hashtag</b> (sans la #) :', 'commentByTweet' );
     echo '</label> ';
     echo '<input type="text" id="commentByTweet_hash" name="commentByTweet_hash" value="' . esc_attr( $hash ) . '" size="25" />';
     echo '<br/><br/>';
-    echo '<label for="commentByTweet_link">';
-    _e( 'Sélectionner des phrases à Tweeter ?', 'commentByTweet_textdomain' );
+
+    echo '<label for="commentByTweet_from">';
+    _e( '<b>Filtrer par compte</b> (séparés par des ,) :', 'commentByTweet' );
     echo '</label> ';
-    echo '<input type="checkbox" id="commentByTweet_link" name="commentByTweet_link" ' . $isChecked . ' />';
+    echo '<input type="text" id="commentByTweet_from" name="commentByTweet_from" value="' . esc_attr( $from ) . '" size="25" />';
+    echo '<br/>';
+	
+    echo '<input type="checkbox" id="commentByTweet_fromMention" name="commentByTweet_fromMention" ';if($fromMention == 'on'){echo 'checked';}echo ' />';
+    echo '<label for="commentByTweet_fromMention" style="font-size:11px">';
+    _e( 'Compte mentionné', 'commentByTweet' );
+    echo '</label><br/>';
+    
+    echo '<input type="checkbox" id="commentByTweet_fromFrom" name="commentByTweet_fromFrom" ';if($fromFrom == 'on'){echo 'checked';}echo ' />';
+    echo '<label for="commentByTweet_fromFrom" style="font-size:11px">';
+    _e( 'De ce compte [selfish mode]', 'commentByTweet' );
+    echo '</label><br/>';
+    
+    echo '<input type="checkbox" id="commentByTweet_fromTo" name="commentByTweet_fromTo" ';if($fromTo == 'on'){echo 'checked';}echo ' />';
+    echo '<label for="commentByTweet_fromTo" style="font-size:11px">';
+    _e( 'A ce compte [discussion]', 'commentByTweet' );
+    echo '</label>';
+    echo '<br/><br/>';
+    
+    echo '<label for="commentByTweet_lang">';
+    _e( '<b>Langue</b> <a href="http://en.wikipedia.org/wiki/List_of_ISO_639-1_codes" target="_blank">[2 lettres]</a> (optionnel) :', 'commentByTweet' );
+    echo '</label><br/>';
+    echo '<input type="text" maxlength="2" size="2" id="commentByTweet_lang" name="commentByTweet_lang" value="'.esc_attr($lang).'" />';
 }
 
 /**
@@ -105,16 +131,24 @@ function commentByTweet_save_meta_box_data( $post_id ) {
 
     // Sanitize user input.
     $hash_data = sanitize_text_field( $_POST['commentByTweet_hash'] );
-    $link_data = sanitize_text_field( $_POST['commentByTweet_link'] );
+    $lang_data = sanitize_text_field( $_POST['commentByTweet_lang'] );
+    $from_data = sanitize_text_field( $_POST['commentByTweet_from'] );
+    $fromTo_data = sanitize_text_field( $_POST['commentByTweet_fromTo'] );
+    $fromFrom_data = sanitize_text_field( $_POST['commentByTweet_fromFrom'] );
+    $fromMention_data = sanitize_text_field( $_POST['commentByTweet_fromMention'] );
 
     // Update the meta field in the database.
     update_post_meta( $post_id, 'commentByTweetHash', $hash_data );
-    update_post_meta( $post_id, 'commentByTweetLink', $link_data );
+    update_post_meta( $post_id, 'commentByTweetLang', $lang_data );
+    update_post_meta( $post_id, 'commentByTweetFrom', $from_data );
+    update_post_meta( $post_id, 'commentByTweetFromTo', $fromTo_data );
+    update_post_meta( $post_id, 'commentByTweetFromFrom', $fromFrom_data );
+    update_post_meta( $post_id, 'commentByTweetFromMention', $fromMention_data );
 }
 add_action( 'save_post', 'commentByTweet_save_meta_box_data' );
 
 /**
- * Display the new comment template if hashtag is set and comments allowed.
+ * Display the new comment template if hashtag is set.
  */
 function commentByTweet($template) {
     global $post;
@@ -132,8 +166,15 @@ add_filter('comments_template', 'commentByTweet');
  *
  * param @string $hash The hash without #.
  */
-function commentByTweetGet($hash) {
+function commentByTweetGet() {
 	global $post;
+	
+	$hash = get_post_meta( $post->ID, 'commentByTweetHash', true );
+	$lang = get_post_meta( $post->ID, 'commentByTweetLang', true );
+	$from = get_post_meta( $post->ID, 'commentByTweetFrom', true );
+	$fromTo = get_post_meta( $post->ID, 'commentByTweetFromTo', true );
+	$fromFrom = get_post_meta( $post->ID, 'commentByTweetFromFrom', true );
+	$fromMention = get_post_meta( $post->ID, 'commentByTweetFromMention', true );
 	
     if ($hash == '' ||
         get_option('commentByTweet_CONSUMER_KEY') == FALSE ||
@@ -145,7 +186,7 @@ function commentByTweetGet($hash) {
     
     // is cached ?
     $cache = get_transient( 'tweets-'.$hash );
-    if ($cache != false) {
+    if ($cache != false && !current_user_can('edit_post', $post->ID) ) {
         echo $cache;
         return;
     }
@@ -158,22 +199,50 @@ function commentByTweetGet($hash) {
         'user_token'       => get_option('commentByTweet_ACCESS_TOKEN'),
         'user_secret'      => get_option('commentByTweet_ACCESS_TOKEN_SECRET'),
     ));
+	
     
+    // account filter
+	if ($from !== '') {
+		$mentionMe = ' cc';
+		$filterFrom = '(';
+		
+        // multiple account ?
+		$account = explode(',', $from);		
+		foreach($account as $f) {
+			if ($fromTo != '') {
+				$filterFrom .= 'to:'.$f.' OR ';
+			}
+
+			if ($fromFrom != '') {
+				$filterFrom .= 'from:'.$f.' OR ';
+			}
+
+			if ($fromMention != '') {
+				$filterFrom .= '@'.$f.' OR ';
+			}
+			
+			$mentionMe .= ' @'.$f;
+		}
+		
+		$filterFrom = trim(trim($filterFrom, ' OR ').')', '()');
+	}
+	
     // get json
-    $response = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/search/tweets.json'), array('q' => '%23'.$hash.'+exclude:retweets', 'count' => 100));
+    $response = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/search/tweets.json'), array('q' => '%23'.$hash.' +exclude:retweets '.$filterFrom, 'lang' => $lang, 'count' => 100));
     
     // 200 = ok
     if ($response == 200) {
         
         // store result
         $data = json_decode($tmhOAuth->response['response'], true);
-        
+
         // count number of tweets
         $nb = count($data['statuses']);
         
-        $return = '<h2 class="comments-title">' . $nb . ' tweets à propos de #'.$hash.'</h2>
+        // output html
+        $return = '<h2 class="comments-title">' . $nb . ' tweets '.__('à propos de', 'commentByTweet').' #'.$hash.'</h2>
         <span class="tacTwitter"></span>
-        <a href="https://twitter.com/intent/tweet?button_hashtag='.$hash.'&text=%20'.get_permalink().'" class="twitter-hashtag-button" data-size="large" data-dnt="true">Tweet #'.$hash.'</a>';
+        <a href="https://twitter.com/intent/tweet?button_hashtag='.$hash.'&text=%20'.get_permalink().$mentionMe.'" class="twitter-hashtag-button" data-size="large" data-dnt="true">Tweet #'.$hash.'</a>';
         
         // construct the blockquote for embed tweet
         foreach ($data['statuses'] as $tweet) {
@@ -195,63 +264,65 @@ function commentByTweetGet($hash) {
 }
 
 /**
- * Add link for tweeting
- *
- * param @string $content The content
+ * Icon shortcodes (by fontello).
  */
-function commentByTweetLink($content) {
-    global $post;
+function commentByTweetIcon() {
+    return '<span class="icon_54047278-twitter"></span>';
+}
+add_shortcode( 'twitter_icon', 'commentByTweetIcon' );
+
+/**
+ * Tweet link shortcode.
+ *
+ * param @array $atts Text
+ */
+function commentByTweetHash($atts) {
+	global $post;
+	
+    if(get_post_meta( $post->ID, 'commentByTweetHash', true ) != '') {
+        $hash = ' #'.get_post_meta( $post->ID, 'commentByTweetHash', true );
+    }
+	
+    return 'https://twitter.com/intent/tweet?text=' . urlencode($atts['text'] . $hash . ' ' . wp_get_shortlink($post->ID));
+}
+add_shortcode( 'twitter_linkhash', 'commentByTweetHash' );
+
+/**
+ * Add a button to the tinymce editor.
+ */
+function commentByTweet_shortcode_button_init() {
     
-    if(get_post_meta( $post->ID, 'commentByTweetLink', true ) != 'on') {
-        return $content;
+    //Abort early if the user will never see TinyMCE
+    if ( ! current_user_can('edit_posts') && ! current_user_can('edit_pages') && get_user_option('rich_editing') == 'true') {
+        return;
     }
 
-    // append the hashtag and the url
-    $append = '';
-    if(get_post_meta( $post->ID, 'commentByTweetHash', true ) != '') {
-        $append .= ' #'.get_post_meta( $post->ID, 'commentByTweetHash', true );
-    }
-    $append .= ' '.get_permalink($post->ID);
-    
-    // calculate the max chars (minus 3 for 'RT ')
-    $min = 30;
-    $max = 157 - strlen($append);
-    
-    // 1 link per <hx> tag
-    $explodeHx = preg_split('/<h[1-6]>/m', $content);
-    foreach($explodeHx as $pTags) {
-        $found = false;
-        
-        // remove all tags except <p>
-        $pTags = preg_replace('/^[^<]+<\/h[1-6]>/', '', $pTags);
-        $pTags = preg_replace('/<\/?p>/m', '', $pTags);
-        $pTags = preg_replace('/<[^>]+>[^<]+<\/[^>]+>/mU', '', $pTags);
-        
-        // search sentences
-        preg_match_all('/[A-Z][^.!?<>\n\r]+[.!?]{1,3}[\s\r\n]+/m', $pTags, $phrase);
-        foreach($phrase[0] as $p) {
-            $p = trim($p);
-            
-            // if the size is correct, transform in link and stop
-            if(strlen(html_entity_decode($p)) > $min && 
-               strlen(html_entity_decode($p)) < $max && 
-               $found === false && 
-               preg_match('/'.preg_quote($p, '/').'/', $content)) {
-                $found = true;
-                $content = preg_replace('/'.preg_quote($p, '/').'/', '<a href="https://twitter.com/intent/tweet?text='.urlencode(html_entity_decode($p).$append).'" target="_blank" rel="nofollow" style="color:#4099ff"><span class="icon-twitter"></span> '.$p.'</a>', $content);
-            }
-        }
-    }
-    
-    return $content;
+    // callback to regiser our tinymce plugin   
+    add_filter("mce_external_plugins", "commentByTweet_register_tinymce_plugin"); 
+
+    // callback to add our button to the TinyMCE toolbar
+    add_filter('mce_buttons', 'commentByTweet_add_tinymce_button');
 }
-add_filter('the_content', 'commentByTweetLink');
+function commentByTweet_register_tinymce_plugin($plugin_array) {
+    $plugin_array['commentByTweet_button'] = plugins_url('comment-by-tweet/js/tinymce-plugin.js');
+    return $plugin_array;
+}
+function commentByTweet_add_tinymce_button($buttons) {
+    $buttons[] = "commentByTweet_button";
+    return $buttons;
+}
+add_action('init', 'commentByTweet_shortcode_button_init');
 
 /**
  * CSS et Javascript
  */
 function commentByTweetCSS() {
-	wp_register_style('commentByTweet', plugins_url('comment-by-tweet/fontello/css/fontello.css'));
-    wp_enqueue_style('commentByTweet');
+	wp_enqueue_style('commentByTweet', plugins_url('comment-by-tweet/fontello/css/fontello.css'));
+    wp_enqueue_script('commentByTweet', plugins_url('comment-by-tweet/js/twitter-sdk.js'));
 }
 add_action('wp_enqueue_scripts', 'commentByTweetCSS');
+
+function commentByTweetAdminCSS() {
+	wp_enqueue_style( 'commentByTweet', plugins_url( 'comment-by-tweet/css/custom-icon.css' ) );
+}
+add_action( 'admin_enqueue_scripts', 'commentByTweetAdminCSS' );
