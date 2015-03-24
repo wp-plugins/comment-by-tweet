@@ -247,7 +247,7 @@ function commentByTweetGet() {
         // construct the blockquote for embed tweet
         foreach ($data['statuses'] as $tweet) {
             $return .= '<blockquote class="twitter-tweet" lang="'.$tweet['lang'].'">
-                <p>'.$tweet['text'].'</p>&mdash; '.$tweet['user']['name'].' (@'.$tweet['user']['screen_name'].') <a href="https://twitter.com/ressourceinfo/status/'.$tweet['id'].'">'.date('l j M @ G:i', strtotime($tweet['created_at'])).'</a>
+                <p>'.$tweet['text'].'</p>&mdash; '.$tweet['user']['name'].' (@'.$tweet['user']['screen_name'].') <a rel="nofollow" href="https://twitter.com/ressourceinfo/status/'.$tweet['id'].'">'.date('l j M @ G:i', strtotime($tweet['created_at'])).'</a>
             </blockquote>';
         }
         
