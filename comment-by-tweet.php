@@ -228,7 +228,7 @@ function commentByTweetGet() {
 	}
 	
     // get json
-    $response = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/search/tweets.json'), array('q' => '%23'.$hash.' +exclude:retweets '.$filterFrom, 'lang' => $lang, 'count' => 100));
+    $response = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/search/tweets.json'), array('q' => '%23'.$hash.' +exclude:retweets '.$filterFrom, 'lang' => strtolower($lang), 'count' => 100));
     
     // 200 = ok
     if ($response == 200) {
@@ -283,7 +283,7 @@ function commentByTweetHash($atts) {
         $hash = ' #'.get_post_meta( $post->ID, 'commentByTweetHash', true );
     }
 	
-    return 'https://twitter.com/intent/tweet?text=' . urlencode($atts['text'] . $hash . ' ' . wp_get_shortlink($post->ID));
+    return 'https://twitter.com/intent/tweet?text=' . urlencode($atts['text'] . $hash . ' ' . get_permalink($post->ID));
 }
 add_shortcode( 'twitter_linkhash', 'commentByTweetHash' );
 
