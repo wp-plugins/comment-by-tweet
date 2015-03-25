@@ -10,8 +10,8 @@ jQuery(document).ready(function ($) {
 
                 if (selected) {
 					msgLength = (jQuery('#commentByTweet_hash').val() + ' ' + tinyMCE.activeEditor.selection.getContent({format : 'text'}) + ' ' + jQuery('#shortlink').val()).length;
-					if (msgLength > 160) {
-						alert('Le message est trop long de ' + (msgLength - 160) + ' caractères');
+					if (msgLength > 140) {
+						alert('Le message est trop long de ' + (msgLength - 140) + ' caractères');
 					} else {
 						content = '<a href="[twitter_linkhash text=\'' + tinyMCE.activeEditor.selection.getContent({format : 'text'}).replace(/'/g, " ") + '\']" target="_blank" rel="nofollow" style="color:#4099ff">[twitter_icon] ' + selected + '</a>';
                         tinymce.execCommand('mceInsertContent', false, content);
