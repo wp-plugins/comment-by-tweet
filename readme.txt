@@ -35,6 +35,10 @@ Remplace le système de commentaire Wordpress de base par un écosystème basé 
 
 == Changelog ==
 
+= 0.3 =
+* Bug fixes
+* Tweet highlighted text
+
 = 0.2 =
 * Filtrage par @compte
 * Ajout des liens depuis l'éditeur tinymce

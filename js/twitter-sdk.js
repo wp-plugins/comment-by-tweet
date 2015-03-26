@@ -2,7 +2,7 @@
  * Include the Twitter SDK
  * Support tarteaucitron.js
  */
-if (commentByTweetSDK === undefined) {
+if (typeof commentByTweetSDK !== 'function') {
     commentByTweetSDK = function () {
         if (tarteaucitron !== undefined) {
             (tarteaucitron.job = tarteaucitron.job || []).push('twitter');

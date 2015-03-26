@@ -11,9 +11,9 @@ jQuery(document).ready(function ($) {
                 if (selected) {
 					msgLength = (jQuery('#commentByTweet_hash').val() + ' ' + tinyMCE.activeEditor.selection.getContent({format : 'text'}) + ' ' + jQuery('#shortlink').val()).length;
 					if (msgLength > 140) {
-						alert('Le message est trop long de ' + (msgLength - 140) + ' caractères');
+						alert('Le message est trop long de ' + (msgLength - 140) + ' car.');
 					} else {
-						content = '<a href="[twitter_linkhash text=\'' + tinyMCE.activeEditor.selection.getContent({format : 'text'}).replace(/'/g, " ") + '\']" target="_blank" rel="nofollow" style="color:#4099ff">[twitter_icon] ' + selected + '</a>';
+						content = '<a href="[twitter_linkhash text=\'' + tinyMCE.activeEditor.selection.getContent({format : 'text'}).replace(/'/g, "_apos_") + '\']" target="_blank" rel="nofollow" style="color:#4099ff">[twitter_icon] ' + selected + '</a>';
                         tinymce.execCommand('mceInsertContent', false, content);
 					}
                 } else {

@@ -3,7 +3,7 @@
 Plugin Name: Comment by Tweet
 Plugin URI: http://amauri.champeaux.fr/comment-by-tweet/
 Description: Système de commentaires basé sur les hashtags Twitter
-Version: 0.2
+Version: 0.3
 Author: Amauri CHAMPEAUX
 Author URI: http://amauri.champeaux.fr/a-propos/
 */
@@ -185,7 +185,7 @@ function commentByTweetGet() {
     }
     
     // is cached ?
-    $cache = get_transient( 'tweets-'.$hash );
+    $cache = get_transient( 'tweets_h-'.$hash );
     if ($cache != false && !current_user_can('edit_post', $post->ID) ) {
         echo $cache;
         return;
@@ -251,13 +251,16 @@ function commentByTweetGet() {
             </blockquote>';
         }
         
+		$return .= '<input type="hidden" id="commentByTweetHash" value="'.$hash.'" />
+		<div id="commentByTweetMe" style="display:none;position:absolute;z-index:2147483647"></div>';
+		
         // store to cache
         $delay = time() - get_the_time('U');
         if ($delay < 86400) {$cacheFor = 600;} // cache 10mn the first day
         elseif ($delay >= 86400 && $delay < (86400*3)) {$cacheFor = 3600;} // cache for 1
         elseif ($delay >= (86400*3) && $delay < (86400*7)) {$cacheFor = 7200;} // cache for 2 hours the first week
         else {$cacheFor = 86400;} // cache for 1 day
-        set_transient('tweets-'.$hash, $return, $cacheFor);
+        set_transient('tweets_h-'.$hash, $return, $cacheFor);
         
         echo $return;
     }
@@ -283,7 +286,7 @@ function commentByTweetHash($atts) {
         $hash = ' #'.get_post_meta( $post->ID, 'commentByTweetHash', true );
     }
 	
-    return 'https://twitter.com/intent/tweet?text=' . urlencode($atts['text'] . $hash . ' ' . get_permalink($post->ID));
+    return 'https://twitter.com/intent/tweet?text=' . urlencode(preg_replace("/_apos_/", "'", $atts['text']) . $hash . ' ' . get_permalink($post->ID));
 }
 add_shortcode( 'twitter_linkhash', 'commentByTweetHash' );
 
@@ -318,7 +321,8 @@ add_action('init', 'commentByTweet_shortcode_button_init');
  */
 function commentByTweetCSS() {
 	wp_enqueue_style('commentByTweet', plugins_url('comment-by-tweet/fontello/css/fontello.css'));
-    wp_enqueue_script('commentByTweet', plugins_url('comment-by-tweet/js/twitter-sdk.js'));
+    wp_enqueue_script('commentByTweetSDK', plugins_url('comment-by-tweet/js/twitter-sdk.js'));
+    wp_enqueue_script('commentByTweetHighlight', plugins_url('comment-by-tweet/js/tweet-on-highlight.js'), array( 'jquery' ));
 }
 add_action('wp_enqueue_scripts', 'commentByTweetCSS');
 
