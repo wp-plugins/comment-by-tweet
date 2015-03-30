@@ -3,7 +3,7 @@
 Plugin Name: Comment by Tweet
 Plugin URI: http://amauri.champeaux.fr/comment-by-tweet/
 Description: Système de commentaires basé sur les hashtags Twitter
-Version: 0.3
+Version: 0.3.1
 Author: Amauri CHAMPEAUX
 Author URI: http://amauri.champeaux.fr/a-propos/
 */
@@ -250,9 +250,6 @@ function commentByTweetGet() {
                 <p>'.$tweet['text'].'</p>&mdash; '.$tweet['user']['name'].' (@'.$tweet['user']['screen_name'].') <a rel="nofollow" href="https://twitter.com/ressourceinfo/status/'.$tweet['id'].'">'.date('l j M @ G:i', strtotime($tweet['created_at'])).'</a>
             </blockquote>';
         }
-        
-		$return .= '<input type="hidden" id="commentByTweetHash" value="'.$hash.'" />
-		<div id="commentByTweetMe" style="display:none;position:absolute;z-index:2147483647"></div>';
 		
         // store to cache
         $delay = time() - get_the_time('U');
@@ -265,6 +262,19 @@ function commentByTweetGet() {
         echo $return;
     }
 }
+
+/**
+ * Display div container at bottom.
+ */
+function commentByTweetFooter() {
+   	global $post;
+	
+	$hash = get_post_meta( $post->ID, 'commentByTweetHash', true );
+    if ($hash != '') {
+        echo '<input type="hidden" id="commentByTweetHash" value="'.$hash.'" /><div id="commentByTweetMe" style="display:none;position:absolute;z-index:2147483647"></div>';
+    }
+}
+add_action('wp_footer', 'commentByTweetFooter');
 
 /**
  * Icon shortcodes (by fontello).
