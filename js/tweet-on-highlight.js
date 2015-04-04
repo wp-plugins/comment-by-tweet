@@ -15,7 +15,7 @@ jQuery(document).mouseup(function(event){
         text = document.selection.createRange().text;
     }
     if (text.length < 120 && text.length > 1 && event.target.id !== 'commentByTweetAutoA') {
-        if (document.getElementById('commentByTweetHash') !== null && text.length < 120 && text.length > 1) {
+        if (document.getElementById('commentByTweetHash') !== null) {
 		    text += ' #' + document.getElementById('commentByTweetHash').value;
 		}
 		

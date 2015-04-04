@@ -3,7 +3,7 @@ Contributors: Amauri CHAMPEAUX
 Tags: comment, twitter
 Requires at least: 2.8
 Tested up to: 4.1
-Stable tag: trunk
+Stable tag: 0.3
 
 Système de commentaire basé sur Twitter et les #hashtags
 
@@ -34,6 +34,13 @@ Remplace le système de commentaire Wordpress de base par un écosystème basé 
 2. Configuration
 
 == Changelog ==
+
+= 0.4.1 =
+* Réécriture en POO
+* Amélioration de l'affichage du lien pour tweeter à la sélection du texte
+* + Ajout d'un filtre antispam : uniquement mes abonnements
+* + Ajout d'une page (dans outils) affichant les logs de l'API et les informations en bdd
+* + Archivage des tweets (l'API est limité à la dernière semaine)
 
 = 0.3 =
 * Bug fixes
