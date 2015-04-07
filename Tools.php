@@ -31,7 +31,7 @@ if(!class_exists('ToolsCommentByTweet'))
 			global $post;
 	
 			$hash = get_post_meta( $post->ID, 'commentByTweetHash', true );
-			if ($hash != '' AND get_option('commentByTweet_TWEETBUTTON') == 'on') {
+			if ($hash != '' AND get_option('commentByTweet_TWEETBUTTON') == 'on' AND is_singular()) {
 				echo '<input type="hidden" id="commentByTweetHash" value="'.$hash.'" /><div id="commentByTweetMe" style="display:none;position:absolute;z-index:2147483647"></div>';
 			}
 		}

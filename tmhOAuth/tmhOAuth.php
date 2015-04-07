@@ -11,6 +11,10 @@
  *
  * 06 Aug 2014
  */
+ 
+if(!class_exists('tmhOAuth'))
+{
+
 defined('__DIR__') or define('__DIR__', dirname(__FILE__));
 
 class tmhOAuth {
@@ -859,4 +863,5 @@ class tmhOAuth {
 
     return $code;
   }
+}
 }

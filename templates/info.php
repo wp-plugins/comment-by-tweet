@@ -10,6 +10,11 @@
       		echo '<b>Yes ('.count($Ids_cached).')</b>';
 		} else {echo '<b>No</b>';}
 		?>
+		<br/><br/>
+		<form action="" method="post">
+		<input type="hidden" name="commentbytweet_maj_friends" value="1" />
+		<input type="submit" value="Update now" />
+		</form>
     </div>
     <h2 style="margin-bottom:20px;margin-top:20px;">Stats</h2>
     <div class="commentByTweetDiv">
@@ -18,6 +23,7 @@
 				<td><b>#hash</b></td>
 				<td><b>Number</b></td>
 				<td><b>Last id</b></td>
+				<td><b>Delete</b></td>
 			</tr>
 			<?php
 			$query = $wpdb->get_results("SELECT {$wpdb->prefix}cbt_hash.hash, COUNT({$wpdb->prefix}cbt_tweets.id) as number, {$wpdb->prefix}cbt_hash.last_id FROM {$wpdb->prefix}cbt_hash JOIN {$wpdb->prefix}cbt_tweets ON {$wpdb->prefix}cbt_hash.id = {$wpdb->prefix}cbt_tweets.hash_id GROUP BY {$wpdb->prefix}cbt_hash.hash ORDER BY {$wpdb->prefix}cbt_hash.hash ASC");
@@ -26,6 +32,7 @@
 					<td>'.$obj->hash.'</td>
 					<td>'.$obj->number.'</td>
 					<td>'.$obj->last_id.'</td>
+					<td><form action="" method="post"><input type="hidden" name="commentbytweet_purge_all" value="'.$obj->hash.'" /><input type="submit" value="Delete" onclick="return(confirm(\'Delete all tweets for #'.$obj->hash.' ?\'));" /></form></td>
 				</tr>';
 			}
 			?>

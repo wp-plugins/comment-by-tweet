@@ -3,7 +3,7 @@
 Plugin Name: Comment by Tweet
 Plugin URI: http://amauri.champeaux.fr/comment-by-tweet/
 Description: Système de commentaires basé sur les hashtags Twitter
-Version: 0.4.1
+Version: 0.4.2
 Author: Amauri CHAMPEAUX
 Author URI: http://amauri.champeaux.fr/a-propos/
 */

@@ -68,9 +68,9 @@ if(!class_exists('AdminCommentByTweet'))
 		      	get_option('commentByTweet_CONSUMER_SECRET') == FALSE ||
 		      	get_option('commentByTweet_ACCESS_TOKEN') == FALSE ||
 		      	get_option('commentByTweet_ACCESS_TOKEN_SECRET') == FALSE) {
+					echo '<br/><br/><br/>';
 		   			_e('Veuillez commencer par configurer l\'API OAuth via la page des réglages.');
-			} else {
-    
+			} else {   
 	   			// oauth
 	   			include(dirname(__FILE__) . '/tmhOAuth/tmhOAuth.php');
 	   			$tmhOAuth = new tmhOAuth(array(
@@ -86,6 +86,19 @@ if(!class_exists('AdminCommentByTweet'))
 	            if ($userId == 200) {
 	                $userData = json_decode($tmhOAuth->response['response'], true);
 	            }
+				
+				// force friends update
+				if ($_POST['commentbytweet_maj_friends'] == '1') {
+					$Ids = $APICommentByTweet->retrieveFriends($tmhOAuth, $userData['id'], array($userData['id']));
+					set_transient('twitter_abonnements', $Ids, 21600);
+				}
+				
+				// delete all tweets
+				if ($_POST['commentbytweet_purge_all'] != '') {
+					$hashToPurge = $_POST['commentbytweet_purge_all'];
+					$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}cbt_tweets WHERE `hash_id` IN (SELECT id FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s)", $hashToPurge));
+					$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s", $hashToPurge));
+				}
 	            
 	            if($APICommentByTweet->check_ping('/application/rate_limit_status')) {
 		            $apiLimit = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/application/rate_limit_status.json'), array('resources' => 'account,application,friends,search'));

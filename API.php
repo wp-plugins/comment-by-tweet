@@ -6,6 +6,7 @@ if(!class_exists('APICommentByTweet'))
 	{
 		public function __construct() {
 			add_filter('comments_template', array($this, 'load_template'));
+			add_shortcode('comment_by_tweet', array($this, 'shortcode'));
 		}
 		
 		/**
@@ -17,6 +18,20 @@ if(!class_exists('APICommentByTweet'))
 				return;
 			}
 			return dirname(__FILE__) . '/templates/comments.php';
+		}
+		
+		/**
+		* Show the comment template via shortcode.
+		*/
+		public function shortcode() {
+			global $post;
+			if ( !is_singular() || get_post_meta( $post->ID, 'commentByTweetHash', true ) == '') {
+				return;
+			}
+			return '<div id="comments" class="comments-area">
+				<!-- commment-by-tweet -->
+				'.$this->show_tweets(false).'
+			</div>';
 		}
 		
 		/**
@@ -42,7 +57,7 @@ if(!class_exists('APICommentByTweet'))
 		/**
 		* Retrieve all tweets.
 		*/
-		public function show_tweets() {
+		public function show_tweets($echo = true) {
 			global $wpdb, $post;
 	
 			$hash = get_post_meta( $post->ID, 'commentByTweetHash', true );
@@ -58,8 +73,12 @@ if(!class_exists('APICommentByTweet'))
 			// is cached ?
 			$cache = get_transient( 'tweets_h-'.$hash );
 			if ($cache == '1' && !current_user_can('edit_post', $post->ID) ) {
-				echo $this->render($hash);
-				return;
+				if($echo == true) {
+					echo $this->render($hash);
+					return;
+				} else {
+					return $this->render($hash);
+				}
 			}
     
 			// oauth
@@ -117,7 +136,11 @@ if(!class_exists('APICommentByTweet'))
 				else {$cacheFor = 86400;} // cache for 1 day
 				set_transient('tweets_h-'.$hash, '1', $cacheFor);
         
-				echo $this->render($hash);
+				if($echo == true) {
+					echo $this->render($hash);
+				} else {
+					return $this->render($hash);
+				}
 			}
 		}
 		
