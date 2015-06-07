@@ -170,6 +170,7 @@ if(!class_exists('APICommentByTweet'))
 				} else {
 			
 					// oauth
+					include(dirname(__FILE__) . '/tmhOAuth/tmhOAuth.php');
 					$tmhOAuth = new tmhOAuth(array(
 						'consumer_key'     => get_option('commentByTweet_CONSUMER_KEY'),
 						'consumer_secret'  => get_option('commentByTweet_CONSUMER_SECRET'),

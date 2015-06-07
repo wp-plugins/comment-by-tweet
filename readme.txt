@@ -3,7 +3,7 @@ Contributors: Amauri CHAMPEAUX
 Tags: comment, twitter
 Requires at least: 2.8
 Tested up to: 4.1
-Stable tag: 0.4.2
+Stable tag: 0.4.3
 
 Système de commentaire basé sur Twitter et les #hashtags
 
