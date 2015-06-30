@@ -88,16 +88,20 @@ if(!class_exists('AdminCommentByTweet'))
 	            }
 				
 				// force friends update
-				if ($_POST['commentbytweet_maj_friends'] == '1') {
-					$Ids = $APICommentByTweet->retrieveFriends($tmhOAuth, $userData['id'], array($userData['id']));
-					set_transient('twitter_abonnements', $Ids, 21600);
+				if (isset($_POST['commentbytweet_maj_friends'])) {
+					if ($_POST['commentbytweet_maj_friends'] == '1') {
+						$Ids = $APICommentByTweet->retrieveFriends($tmhOAuth, $userData['id'], array($userData['id']));
+						set_transient('twitter_abonnements', $Ids, 21600);
+					}
 				}
 				
 				// delete all tweets
-				if ($_POST['commentbytweet_purge_all'] != '') {
-					$hashToPurge = $_POST['commentbytweet_purge_all'];
-					$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}cbt_tweets WHERE `hash_id` IN (SELECT id FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s)", $hashToPurge));
-					$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s", $hashToPurge));
+				if (isset($_POST['commentbytweet_purge_all'])) {
+					if ($_POST['commentbytweet_purge_all'] != '') {
+						$hashToPurge = $_POST['commentbytweet_purge_all'];
+						$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}cbt_tweets WHERE `hash_id` IN (SELECT id FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s)", $hashToPurge));
+						$wpdb->query($wpdb->prepare("DELETE FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s", $hashToPurge));
+					}
 				}
 	            
 	            if($APICommentByTweet->check_ping('/application/rate_limit_status')) {

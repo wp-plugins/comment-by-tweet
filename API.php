@@ -92,8 +92,8 @@ if(!class_exists('APICommentByTweet'))
 	
 			// store hash info
 			$hash_info = $wpdb->get_row($wpdb->prepare("SELECT `id`, `last_id` FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s", $hash));
-			if($hash_info->id == '') {
-				$wpdb->query($wpdb->prepare("INSERT INTO {$wpdb->prefix}cbt_hash (`last_id`, `hash`) VALUES(%d, %s)", 0, $hash));
+			if(isset($hash_info->id)) {
+				$wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->prefix}cbt_hash (`last_id`, `hash`) VALUES(%d, %s)", 0, $hash));
 				$hash_info = $wpdb->get_row($wpdb->prepare("SELECT `id`, `last_id` FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s", $hash));
 			}
 
@@ -111,7 +111,7 @@ if(!class_exists('APICommentByTweet'))
 				// construct the blockquote for embed tweet
 				foreach ($data['statuses'] as $tweet) {
 					$wpdb->query( $wpdb->prepare(
-						"INSERT INTO {$wpdb->prefix}cbt_tweets
+						"INSERT IGNORE INTO {$wpdb->prefix}cbt_tweets
 						( `hash_id`, `tweet_id`, `lang`, `text`, `user_id`, `user_name`, `user_screen_name`, `created_at` )
 						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s )", 
 						$hash_info->id,
@@ -244,7 +244,7 @@ if(!class_exists('APICommentByTweet'))
 	
 			$return = '<h2 class="comments-title">' . $nbTweets . ' tweets '.__('à propos de', 'commentByTweet').' #'.$hash.'</h2>
 			<span class="tacTwitter"></span>
-			<a href="https://twitter.com/intent/tweet?button_hashtag='.$hash.'&text=%20'.get_permalink().$mentionMe.'" class="twitter-hashtag-button" data-size="large" data-dnt="true">Tweet #'.$hash.'</a>'.$return;
+			<a href="https://twitter.com/intent/tweet?button_hashtag='.$hash.'&text=%20'.get_permalink().'" class="twitter-hashtag-button" data-size="large" data-dnt="true">Tweet #'.$hash.'</a>'.$return;
 	
 			return $return;
 		}
