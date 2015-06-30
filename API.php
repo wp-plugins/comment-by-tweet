@@ -92,14 +92,16 @@ if(!class_exists('APICommentByTweet'))
 	
 			// store hash info
 			$hash_info = $wpdb->get_row($wpdb->prepare("SELECT `id`, `last_id` FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s", $hash));
-			if(isset($hash_info->id)) {
+			if(!isset($hash_info->id)) {
 				$wpdb->query($wpdb->prepare("INSERT IGNORE INTO {$wpdb->prefix}cbt_hash (`last_id`, `hash`) VALUES(%d, %s)", 0, $hash));
 				$hash_info = $wpdb->get_row($wpdb->prepare("SELECT `id`, `last_id` FROM {$wpdb->prefix}cbt_hash WHERE `hash` = %s", $hash));
 			}
 
 			// get json
 			if($this->check_ping('/search/tweets')) {
-				$response = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/search/tweets.json'), array('q' => '%23'.$hash.'%20-filter:retweets', 'since_id' => $hash_info->last_id, 'count' => 100, 'result_type' => 'mixed'));
+				$last_id = '';
+				if (isset($hash_info->last_id)) {$last_id = $hash_info->last_id;}
+				$response = $tmhOAuth->request('GET', $tmhOAuth->url('1.1/search/tweets.json'), array('q' => '%23'.$hash.'%20-filter:retweets', 'since_id' => $last_id, 'count' => 100, 'result_type' => 'mixed'));
 			}
      
 			// 200 = ok
@@ -110,11 +112,13 @@ if(!class_exists('APICommentByTweet'))
 		
 				// construct the blockquote for embed tweet
 				foreach ($data['statuses'] as $tweet) {
+					$info = '';
+					if (isset($hash_info->id)) {$info = $hash_info->id;}
 					$wpdb->query( $wpdb->prepare(
 						"INSERT IGNORE INTO {$wpdb->prefix}cbt_tweets
 						( `hash_id`, `tweet_id`, `lang`, `text`, `user_id`, `user_name`, `user_screen_name`, `created_at` )
 						VALUES ( %d, %s, %s, %s, %s, %s, %s, %s )", 
-						$hash_info->id,
+						$info,
 						$tweet['id'], 
 						$tweet['lang'],
 						$tweet['text'],
@@ -197,9 +201,11 @@ if(!class_exists('APICommentByTweet'))
 				$displayThisTweet = true;
             
 				// antispam : uniquement mes abonnements
-				if(is_array($Ids)) {
-					if(!in_array($obj->user_id, $Ids)) {
-						$displayThisTweet = false;
+				if (isset($Ids)) {
+					if(is_array($Ids)) {
+						if(!in_array($obj->user_id, $Ids)) {
+							$displayThisTweet = false;
+						}
 					}
 				}
 		
