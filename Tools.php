@@ -16,6 +16,7 @@ if(!class_exists('ToolsCommentByTweet'))
 		
 		public function css() {
 			wp_enqueue_style('commentByTweet', plugins_url('comment-by-tweet/fontello/css/fontello.css'));
+			wp_enqueue_script('jquery');
 			wp_enqueue_script('commentByTweetSDK', plugins_url('comment-by-tweet/js/twitter-sdk.js'));
 			wp_enqueue_script('commentByTweetHighlight', plugins_url('comment-by-tweet/js/tweet-on-highlight.js'), array( 'jquery' ));
 		}

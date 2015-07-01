@@ -28,7 +28,7 @@ if(!class_exists('APICommentByTweet'))
 			if ( !is_singular() || get_post_meta( $post->ID, 'commentByTweetHash', true ) == '') {
 				return;
 			}
-			return '<div id="comments" class="comments-area">
+			return '<div id="comments" class="comments-area comment-by-tweet">
 				<!-- commment-by-tweet -->
 				'.$this->show_tweets(false).'
 			</div>';
@@ -151,21 +151,26 @@ if(!class_exists('APICommentByTweet'))
 		/**
 		* Filter and Render tweets in HTML.
 		*/
-		public function render($hash) {
+		public function render($hash, $paginationStart = 1, $ID = null, $UX = true) {
 			global $wpdb, $post;
 	
+			if ($ID == null) {
+				$ID = $post->ID;
+			}
+			
 			$return = '';
 			$nbTweets = 0;
+			$paginationStop = $paginationStart + 10;
 
 			// filtres
-			$lang = get_post_meta( $post->ID, 'commentByTweetLang', true );
-			$from = get_post_meta( $post->ID, 'commentByTweetFrom', true );
-			$fromTo = get_post_meta( $post->ID, 'commentByTweetFromTo', true );
-			$fromFrom = get_post_meta( $post->ID, 'commentByTweetFromFrom', true );
-			$fromMention = get_post_meta( $post->ID, 'commentByTweetFromMention', true );
+			$lang = get_post_meta( $ID, 'commentByTweetLang', true );
+			$from = get_post_meta( $ID, 'commentByTweetFrom', true );
+			$fromTo = get_post_meta( $ID, 'commentByTweetFromTo', true );
+			$fromFrom = get_post_meta( $ID, 'commentByTweetFromFrom', true );
+			$fromMention = get_post_meta( $ID, 'commentByTweetFromMention', true );
     
 			// get all the friend ids if antispam is on
-			if(get_post_meta( $post->ID, 'commentByTweetSpam', true ) == 'on') {
+			if(get_post_meta( $ID, 'commentByTweetSpam', true ) == 'on') {
         
 				// check cache (24 hours)
 				$Ids_cached = get_transient( 'twitter_abonnements' );
@@ -242,17 +247,33 @@ if(!class_exists('APICommentByTweet'))
             
 				if($displayThisTweet == true) {
 					$nbTweets++;
-					$return .= '<blockquote class="twitter-tweet" lang="'.$obj->lang.'">
-						<p>'.$obj->text.'</p>&mdash; '.$obj->user_name.' (@'.$obj->user_screen_name.') <a rel="nofollow" href="https://twitter.com/ressourceinfo/status/'.$obj->tweet_id.'">'.date('l j M @ G:i', strtotime($obj->created_at)).'</a>
-					</blockquote>';
+					
+					if ($nbTweets >= $paginationStart && $nbTweets < $paginationStop) {
+						$return .= '<blockquote class="twitter-tweet" lang="'.$obj->lang.'">
+							<p>'.$obj->text.'</p>&mdash; '.$obj->user_name.' (@'.$obj->user_screen_name.') <a rel="nofollow" href="https://twitter.com/ressourceinfo/status/'.$obj->tweet_id.'">'.date('l j M @ G:i', strtotime($obj->created_at)).'</a>
+						</blockquote>';
+					}
 				}
 			}
+				
+			if ($nbTweets >= $paginationStop) {
+				$return .= '<div id="comment-by-tweet-more-'.$paginationStop.'">
+					<div class="commentByTweetMore" onclick="commentByTweetMore(\''.$hash.'\', \''.$paginationStop.'\', \''.$ID.'\', \''.plugin_dir_url( __FILE__ ).'\');return false">
+						<a href="#" onclick="return false">' . __('Older comments') . '</a>
+					</div>
+				</div>';
+			}
+			
+			if ($UX) {
+				$html = '<h2 class="comments-title">' . $nbTweets . ' tweets '.__('à propos de', 'commentByTweet').' #'.$hash.'</h2>
+				<span class="tacTwitter"></span>
+				<a href="https://twitter.com/intent/tweet?button_hashtag='.$hash.'&text=%20'.get_permalink().'" class="twitter-hashtag-button" data-size="large" data-dnt="true">Tweet #'.$hash.'</a>
+				'.$return;
+			} else {
+				$html = $return;
+			}
 	
-			$return = '<h2 class="comments-title">' . $nbTweets . ' tweets '.__('à propos de', 'commentByTweet').' #'.$hash.'</h2>
-			<span class="tacTwitter"></span>
-			<a href="https://twitter.com/intent/tweet?button_hashtag='.$hash.'&text=%20'.get_permalink().'" class="twitter-hashtag-button" data-size="large" data-dnt="true">Tweet #'.$hash.'</a>'.$return;
-	
-			return $return;
+			return $html;
 		}
 
 		/**

@@ -35,6 +35,10 @@ Remplace le système de commentaire Wordpress de base par un écosystème basé 
 
 == Changelog ==
 
+= 0.4.4 =
+* Ajout d'un systeme de pagination Ajax
+* Fix PHP notices
+
 = 0.4.2 =
 * Affichage du bloc commentaire via le hashtag `[comment_by_tweet]`
 * Mise à jour de la liste des abonnements depuis l'admin

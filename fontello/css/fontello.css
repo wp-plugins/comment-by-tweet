@@ -51,3 +51,12 @@
 }
  
 .icon_54047278-twitter:before { content: '\e800'; } /* '' */
+
+.commentByTweetMore {
+	text-align: center;
+	border: 1px solid #ddd;
+	padding: 15px 0;
+	cursor: pointer;
+	margin: 30px auto 0;
+	background: #f5f5f5;
+}

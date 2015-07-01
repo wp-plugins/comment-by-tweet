@@ -17,3 +17,18 @@ if (window.addEventListener) {
 } else {
     window.attachEvent("onload", commentByTweetSDK);
 }
+
+function commentByTweetMore(hash, start, id, url) {
+	jQuery.ajax({
+	    url : url + 'templates/load_more.php',
+        type : 'GET',
+        data: { hash: hash, start: start, id: id, time: Math.random()},
+        dataType : 'html',
+        success : function(code_html, statut){
+			jQuery('#comment-by-tweet-more-' + start).html(code_html);
+			if (typeof twttr !== 'undefined') {
+				twttr.widgets.load();
+			}
+		}
+    });
+}
