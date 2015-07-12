@@ -2,8 +2,7 @@
 Contributors: Amauri CHAMPEAUX
 Tags: comment, twitter
 Requires at least: 2.8
-Tested up to: 4.1
-Stable tag: 0.4.3
+Tested up to: 4.2
 
 Système de commentaire basé sur Twitter et les #hashtags
 
@@ -34,6 +33,9 @@ Remplace le système de commentaire Wordpress de base par un écosystème basé 
 2. Configuration
 
 == Changelog ==
+
+= 0.4.5 =
+* NOUVEAU Publier un tweet lors de la publication
 
 = 0.4.4 =
 * Ajout d'un systeme de pagination Ajax

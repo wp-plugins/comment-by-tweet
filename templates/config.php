@@ -43,6 +43,7 @@
     <ol>
         <li><?php _e('Rendez vous sur <a href="https://apps.twitter.com" target="_blank">apps.twitter.com</a> et connectez vous avec votre compte Twitter', 'commentByTweet' );?></li>
         <li><?php _e('Cliquez sur “Create New App” et remplissez les champs : Name, Description, Website', 'commentByTweet' );?></li>
+        <li><?php _e('Cliquez sur l’onglet “Permissions” et choisissez “Read and Write”', 'commentByTweet' );?></li>
         <li><?php _e('Cliquez sur l’onglet “Keys and Access Token” et tout en bas “Create my access token”', 'commentByTweet' );?></li>
         <li><?php _e('Cliquez en haut à droite sur “Test OAuth”', 'commentByTweet' );?></li>
     </ol>

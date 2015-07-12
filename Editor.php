@@ -46,7 +46,15 @@ if(!class_exists('EditorCommentByTweet'))
 			$fromFrom       = get_post_meta( $post->ID, 'commentByTweetFromFrom', true );
 			$fromMention    = get_post_meta( $post->ID, 'commentByTweetFromMention', true );
 			$spam           = get_post_meta( $post->ID, 'commentByTweetSpam', true );
+			$sendpost       = get_post_meta( $post->ID, 'commentByTweetPost', true );
 
+			_e( '<b>Promouvoir l\'article</b> :', 'commentByTweet' );
+			echo '<br/><input type="checkbox" id="commentByTweet_post" name="commentByTweet_post" ';if($sendpost == 'on'){echo 'checked';}echo ' />';
+			echo '<label for="commentByTweet_post">';
+			_e( 'Poster un tweet à la publication ?', 'commentByTweet' );
+			echo '</label>';
+			echo '<br/><br/>';
+			
 			echo '<label for="commentByTweet_hash">';
 			_e( '<b>Hashtag</b> (sans la #) :', 'commentByTweet' );
 			echo '</label> ';
@@ -133,13 +141,38 @@ if(!class_exists('EditorCommentByTweet'))
 			}
 
 			// Sanitize user input.
-			$hash_data = sanitize_text_field( $_POST['commentByTweet_hash'] );
-			$lang_data = sanitize_text_field( $_POST['commentByTweet_lang'] );
-			$from_data = sanitize_text_field( $_POST['commentByTweet_from'] );
-			$fromTo_data = sanitize_text_field( $_POST['commentByTweet_fromTo'] );
-			$fromFrom_data = sanitize_text_field( $_POST['commentByTweet_fromFrom'] );
-			$fromMention_data = sanitize_text_field( $_POST['commentByTweet_fromMention'] );
-			$spam_data = sanitize_text_field( $_POST['commentByTweet_spam'] );
+			$hash_data = '';
+			if (isset($_POST['commentByTweet_hash'])) {
+				$hash_data = sanitize_text_field( $_POST['commentByTweet_hash'] );
+			}
+			$lang_data = '';
+			if (isset($_POST['commentByTweet_lang'])) {
+				$lang_data = sanitize_text_field( $_POST['commentByTweet_lang'] );
+			}
+			$from_data = '';
+			if (isset($_POST['commentByTweet_from'])) {
+				$from_data = sanitize_text_field( $_POST['commentByTweet_from'] );
+			}
+			$fromTo_data = '';
+			if (isset($_POST['commentByTweet_fromTo'])) {
+				$fromTo_data = sanitize_text_field( $_POST['commentByTweet_fromTo'] );
+			}
+			$fromFrom_data = '';
+			if (isset($_POST['commentByTweet_fromFrom'])) {
+				$fromFrom_data = sanitize_text_field( $_POST['commentByTweet_fromFrom'] );
+			}
+			$fromMention_data = '';
+			if (isset($_POST['commentByTweet_fromMention'])) {
+				$fromMention_data = sanitize_text_field( $_POST['commentByTweet_fromMention'] );
+			}
+			$spam_data = '';
+			if (isset($_POST['commentByTweet_spam'])) {
+				$spam_data = sanitize_text_field( $_POST['commentByTweet_spam'] );
+			}
+			$post_data = '';
+			if (isset($_POST['commentByTweet_post'])) {
+				$post_data = sanitize_text_field( $_POST['commentByTweet_post'] );
+			}
 
 			// Update the meta field in the database.
 			update_post_meta( $post_id, 'commentByTweetHash', $hash_data );
@@ -149,6 +182,7 @@ if(!class_exists('EditorCommentByTweet'))
 			update_post_meta( $post_id, 'commentByTweetFromFrom', $fromFrom_data );
 			update_post_meta( $post_id, 'commentByTweetFromMention', $fromMention_data );
 			update_post_meta( $post_id, 'commentByTweetSpam', $spam_data );
+			update_post_meta( $post_id, 'commentByTweetPost', $post_data );
 		}
 		
 		/**

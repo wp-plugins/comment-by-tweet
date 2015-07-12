@@ -7,6 +7,7 @@ if(!class_exists('APICommentByTweet'))
 		public function __construct() {
 			add_filter('comments_template', array($this, 'load_template'));
 			add_shortcode('comment_by_tweet', array($this, 'shortcode'));
+			add_action('save_post', array($this, 'postTweet' ), 50, 2);
 		}
 		
 		/**
@@ -146,6 +147,64 @@ if(!class_exists('APICommentByTweet'))
 					return $this->render($hash);
 				}
 			}
+		}
+		
+		/**
+		* Post a tweet.
+		*/
+		public function postTweet($id_post, $post) {
+			// want to post?
+			if (get_post_meta( $id_post, 'commentByTweetPost', true ) != 'on' || 'publish' != $post->post_status) {
+				return;
+			}
+			
+			// oauth
+			include(dirname(__FILE__) . '/tmhOAuth/tmhOAuth.php');
+			$tmhOAuth = new tmhOAuth(array(
+				'consumer_key'     => get_option('commentByTweet_CONSUMER_KEY'),
+				'consumer_secret'  => get_option('commentByTweet_CONSUMER_SECRET'),
+				'user_token'       => get_option('commentByTweet_ACCESS_TOKEN'),
+				'user_secret'      => get_option('commentByTweet_ACCESS_TOKEN_SECRET'),
+			));
+
+			// construct the status
+			$hash = get_post_meta( $id_post, 'commentByTweetHash', true );
+			$url = get_the_permalink();
+			$status = $post->post_title . ' #' . $hash . ' ' . $url;
+			
+			// try to get an image
+			$image = ABSPATH . preg_replace('#' . get_site_url() . '#', '', $this->getImage($id_post));
+
+			// text tweet
+			if ($image == '' || !realpath($image)) {
+				return $tmhOAuth->request('POST', $tmhOAuth->url('1.1/statuses/update.json'), array('status' => $status));
+			}
+			
+			// image tweet
+			if ($image != '') {
+				$source = realpath($image);
+				return $tmhOAuth->request('POST', $tmhOAuth->url('1.1/statuses/update_with_media.json'), array('status' => $status, 'media[]' => "@{$source}"), TRUE, TRUE);
+			}
+		}
+		
+		/**
+		 * Try to find an image.
+		 */
+		public function getImage($id) {
+			$image = wp_get_attachment_image_src( get_post_thumbnail_id( $id ), 'single-post-thumbnail' );
+			if ($image[0] != '') {
+				return $image[0];
+			}
+			
+			$images = get_attached_media('image', $id);
+			foreach($images as $img) {
+				$i = wp_get_attachment_image_src($img->ID, 'medium');
+				if ($i[0] != '') {
+					return $i[0];
+				}
+			}
+			
+			return '';
 		}
 		
 		/**
