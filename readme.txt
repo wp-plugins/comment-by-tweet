@@ -2,7 +2,8 @@
 Contributors: Amauri CHAMPEAUX
 Tags: comment, twitter
 Requires at least: 2.8
-Tested up to: 4.2
+Tested up to: 4.2.2
+Stable tag: trunk
 
 Système de commentaire basé sur Twitter et les #hashtags
 
